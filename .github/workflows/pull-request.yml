@@ -1,0 +1,33 @@
+name: pull request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: validate branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH_NAME"
+
+          if [[ ! "$BRANCH_NAME" =~ ^(feat|feature|bugfix|hotfix|chore|docs|dependabot|refact|test|ci-cd)\/RELO-[0-9]+-[a-z0-9\-]+$ ]]; then
+            echo "❌Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
+            echo "Branch names must start with 'feature/', 'bugfix/', 'hotfix/' , or 'chore/' followed by a description in kebab-case."
+            else
+            echo "✅ Branch name '$BRANCH_NAME' is valid."
+          fi
+
+      - name: Validate pull request title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "Pull request title: $PR_TITLE"
+
+            if [[ ! "$PR_TITLE" =~ ^(feat|feature|bugfix|hotfix|chore|docs|dependabot|refact|test|ci-cd):\ RELO-[0-9]+\ .+ ]]; then
+                echo "❌Error: Pull request title '$PR_TITLE' does not follow the naming convention."
+                echo "Pull request titles must start with 'feat:', 'bugfix:', 'hotfix:' , or 'chore:' followed RELO-[ticket number] and a description."
+            else
+                echo "✅ Pull request title '$PR_TITLE' is valid."
+            fi

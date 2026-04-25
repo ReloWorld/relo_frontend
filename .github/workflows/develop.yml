@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 3. Enable pnpm (via corepack)
+      - name: Enable pnpm
+        run: corepack enable
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. Run ESLint
+      - name: Lint
+        run: pnpm lint
+
+      # 6. Type check (TypeScript safety)
+      - name: Type check
+        run: pnpm tsc --noEmit
+
+      # 7. Prettier check (format validation)
+      - name: Prettier check
+        run: pnpm prettier --check .
+
+      # 8. Build project
+      - name: Build
+        run: pnpm build
