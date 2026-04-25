@@ -16,16 +16,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Enable pnpm
+      - name: Enable pnpm
+        run: corepack enable
+
       # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
-
-      # Enable pnpm
-      - name: Enable pnpm
-        run: corepack enable
 
       # Install dependencies
       - name: Install dependencies

@@ -18,16 +18,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 3. Enable pnpm (via corepack)
+      - name: Enable pnpm
+        run: corepack enable
+
       # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
-
-      # 3. Enable pnpm (via corepack)
-      - name: Enable pnpm
-        run: corepack enable
 
       # 4. Install dependencies
       - name: Install dependencies
