@@ -10,23 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # 1. Checkout full history (REQUIRED)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # 2. Setup Node 22
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 3. Enable pnpm
       - name: Enable pnpm
         run: corepack enable
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22 # ✅ FIXED
-          cache: pnpm
+      # 4. Debug versions (IMPORTANT)
+      - name: Debug versions
+        run: |
+          node -v
+          pnpm -v
 
+      # 5. Install deps
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 6. Run semantic-release
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
