@@ -1,18 +1,18 @@
-name: Release & Deploy Prod
+name: Deploy Production
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['Release']
+    types:
+      - completed
 
 jobs:
-  release:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - run: corepack enable
 
@@ -22,17 +22,10 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build
 
-      # 1. Semantic release first
-      - name: Semantic Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm dlx semantic-release
-
-      # 2. Only deploy if release succeeds
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      # 3. Deploy to Production
       - name: Deploy to Production (Vercel)
         run: vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}

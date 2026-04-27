@@ -5,33 +5,43 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout full history (required for semantic-release)
-      - name: Checkout code
+      # 1. Checkout full history (REQUIRED)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Enable pnpm
+      # 2. Setup Node 22
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 3. Enable pnpm
       - name: Enable pnpm
         run: corepack enable
 
-      # Setup Node
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+      # 4. Debug versions (IMPORTANT)
+      - name: Debug versions
+        run: |
+          node -v
+          pnpm -v
 
-      # Install dependencies
+      # 5. Install deps
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Run semantic release
+      # 6. Run semantic-release
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
